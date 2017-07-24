@@ -36,9 +36,6 @@ struct tcpHeader {
 	uint16_t urgentPointer;
 };
 
-struct udpHeader {
-};
-
 char* returnMacAddress(const uint8_t *macAddr) {
         char *macStr;
 
