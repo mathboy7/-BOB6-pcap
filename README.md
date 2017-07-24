@@ -1,5 +1,5 @@
 # -BOB6-pcap
 
-simple packet capturing tool.
+Simple packet capturing tool.
 
-make all to build it.
+You can easily build and execute source code by "Make all".
