@@ -166,11 +166,9 @@ void printPacketInfo(struct pcap_pkthdr *header, const u_char *pktData) {
 		printf("\n\n");
 		return;
 	}
-	else if(!strcmp(protocolType, "UDP")) {
-		printf("We does not support UDP Header.\n\n");
-		return;
-	}
 	else {
+		printf("We does not support other headers.\n\n");
+		return;
 	}
 }
 
@@ -180,7 +178,6 @@ int main(int argc, char *argv[]) {
 	struct pcap_pkthdr *header;
 	const u_char *pktData;
 	const u_char *packet;
-	bpf_u_int32 packetLen;
 
 	if(argv[1] == NULL) {
 		fprintf(stderr, "Couldn't find default device!\n");
