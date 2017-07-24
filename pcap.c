@@ -41,7 +41,7 @@ char* returnMacAddress(const uint8_t *macAddr) {
 
 	macStr = (char *)malloc(20);
 
-        sprintf(macStr, "%02x:%02x:%02x:%02x:%02x:%02x", macAddr[0], macAddr[1], macAddr[2], macAddr[3], macAddr[4], macAddr[5]);
+        sprintf(macStr, 20, "%02x:%02x:%02x:%02x:%02x:%02x", macAddr[0], macAddr[1], macAddr[2], macAddr[3], macAddr[4], macAddr[5]);
 
         return macStr;
 }
@@ -79,7 +79,7 @@ char* returnIPAddress(uint32_t ipAddr) {
 	
 	ipStr = (char *)malloc(20);
 
-	sprintf(ipStr, "%d.%d.%d.%d", ipAddr&0xff, (ipAddr&0xff00)>>8, (ipAddr&0xff0000)>>16, (ipAddr&0xff000000)>>24);
+	sprintf(ipStr, 20, "%d.%d.%d.%d", ipAddr&0xff, (ipAddr&0xff00)>>8, (ipAddr&0xff0000)>>16, (ipAddr&0xff000000)>>24);
 
 	return ipStr;
 }
