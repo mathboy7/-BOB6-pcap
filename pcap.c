@@ -36,6 +36,48 @@ struct tcpHeader {
 	uint16_t urgentPointer;
 }__attribute__((packed));
 
+void printPacketInfo(struct pcap_pkthdr *header, const u_char *pktData); // parse packet info and print it
+uint16_t typeConvert(uint16_t type); // convert little endian -> number
+char* returnMacAddress(const uint8_t *macAddr); // return mac address string
+char* getEthHeaderType(uint16_t intType);
+char* returnIPAddress(uint32_t ipAddr);
+char* getProtocolType(uint8_t intType);
+
+int main(int argc, char *argv[]) {
+	char errbuf[PCAP_ERRBUF_SIZE];
+	pcap_t *handle;
+	struct pcap_pkthdr *header;
+	const u_char *pktData;
+	const u_char *packet;
+
+	if(argc != 2) {
+		printf("Usage: ./pcap [dev_name]\n");
+		return -1;
+	}
+	
+	if(argv[1] == NULL) {
+		fprintf(stderr, "Couldn't find default device!\n");
+		return 2;
+	}
+
+	printf("Device: %s\n", argv[1]);
+
+	handle = pcap_open_live(argv[1], BUFSIZ, 1, 1000, errbuf);
+	if(handle == NULL) {
+		fprintf(stderr, "Couldn't open device %s: %s\n", argv[1], errbuf);
+		return 2;
+	}
+
+	while(1) {
+		if(pcap_next_ex(handle, &header, &pktData) == -1) {
+			printf("Error occured!\n");
+		}
+		printPacketInfo(header, pktData);
+	}
+	pcap_close(handle);
+	return 0;
+}	
+
 char* returnMacAddress(const uint8_t *macAddr) {
         char *macStr;
 
@@ -50,7 +92,7 @@ uint16_t typeConvert(uint16_t type) {
 	return ((type&0xff)<<8) | ((type&0xff00)>>8);
 }
 
-char* getStringType(uint16_t intType) {
+char* getEthHeaderType(uint16_t intType) {
 	uint16_t type = typeConvert(intType);
 
 	switch(type) {
@@ -125,7 +167,7 @@ void printPacketInfo(struct pcap_pkthdr *header, const u_char *pktData) {
 	printf("Destination Mac address: [%s]\n", dMac);
 	printf("Source MAC address: [%s]\n", sMac);
 
-	ethType = getStringType(ethHdr->type);
+	ethType = getEthHeaderType(ethHdr->type);
 	printf("Protocol type: %s\n\n", ethType);
 
 	if(strcmp(ethType, "IPv4")) {
@@ -170,38 +212,3 @@ void printPacketInfo(struct pcap_pkthdr *header, const u_char *pktData) {
 		return;
 	}
 }
-
-int main(int argc, char *argv[]) {
-	char errbuf[PCAP_ERRBUF_SIZE];
-	pcap_t *handle;
-	struct pcap_pkthdr *header;
-	const u_char *pktData;
-	const u_char *packet;
-
-	if(argc != 2) {
-		printf("Usage: ./pcap [dev_name]\n");
-		return -1;
-	}
-	
-	if(argv[1] == NULL) {
-		fprintf(stderr, "Couldn't find default device!\n");
-		return 2;
-	}
-
-	printf("Device: %s\n", argv[1]);
-
-	handle = pcap_open_live(argv[1], BUFSIZ, 1, 1000, errbuf);
-	if(handle == NULL) {
-		fprintf(stderr, "Couldn't open device %s: %s\n", argv[1], errbuf);
-		return 2;
-	}
-
-	while(1) {
-		if(pcap_next_ex(handle, &header, &pktData) == -1) {
-			printf("Error occured!\n");
-		}
-		printPacketInfo(header, pktData);
-	}
-	pcap_close(handle);
-	return 0;
-}	
