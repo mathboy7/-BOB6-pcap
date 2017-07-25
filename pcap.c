@@ -71,6 +71,7 @@ int main(int argc, char *argv[]) {
 	while(1) {
 		if(pcap_next_ex(handle, &header, &pktData) == -1) {
 			printf("Error occured!\n");
+			return -1;
 		}
 		printPacketInfo(header, pktData);
 	}
