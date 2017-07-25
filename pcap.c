@@ -9,7 +9,7 @@ struct ethernetHeader {
 	uint8_t dMac[6];
 	uint8_t sMac[6];
 	uint16_t type;
-};
+}__attribute__((packed));
 
 struct ipHeader {
 	uint8_t basicInfo;
@@ -22,7 +22,7 @@ struct ipHeader {
 	uint16_t checksum;
 	uint32_t sIP;
 	uint32_t dIP;
-};
+}__attribute__((packed));
 
 struct tcpHeader {
 	uint16_t sPort;
@@ -34,7 +34,7 @@ struct tcpHeader {
 	uint16_t window;
 	uint16_t checksum;
 	uint16_t urgentPointer;
-};
+}__attribute__((packed));
 
 char* returnMacAddress(const uint8_t *macAddr) {
         char *macStr;
