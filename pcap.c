@@ -51,7 +51,6 @@ uint16_t typeConvert(uint16_t type) {
 }
 
 char* getStringType(uint16_t intType) {
-	char *returnStrings[8] = {"XNS_IDP", "IPv4", "X25_PLP", "ARP", "RARP", "NET_IPX", "NET_BIOS", "INVALID"};
 	uint16_t type = typeConvert(intType);
 
 	switch(type) {
