@@ -179,6 +179,11 @@ int main(int argc, char *argv[]) {
 	const u_char *pktData;
 	const u_char *packet;
 
+	if(argc != 2) {
+		printf("Usage: ./pcap [dev_name]\n");
+		return -1;
+	}
+	
 	if(argv[1] == NULL) {
 		fprintf(stderr, "Couldn't find default device!\n");
 		return 2;
