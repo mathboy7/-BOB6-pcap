@@ -41,7 +41,7 @@ char* returnMacAddress(const uint8_t *macAddr) {
 
 	macStr = (char *)malloc(20);
 
-        sprintf(macStr, 20, "%02x:%02x:%02x:%02x:%02x:%02x", macAddr[0], macAddr[1], macAddr[2], macAddr[3], macAddr[4], macAddr[5]);
+        sprintf(macStr, "%02x:%02x:%02x:%02x:%02x:%02x", macAddr[0], macAddr[1], macAddr[2], macAddr[3], macAddr[4], macAddr[5]);
 
         return macStr;
 }
@@ -55,22 +55,22 @@ char* getStringType(uint16_t intType) {
 	uint16_t type = typeConvert(intType);
 
 	switch(type) {
-		case 0x0600:
-			return returnStrings[0];
-		case 0x0800:
-			return returnStrings[1];
+                case 0x0600:
+                        return "XNS_IDP";
+                case 0x0800:
+                        return "IPv4";
                 case 0x0805:
-                        return returnStrings[2];
+                        return "X25_PLP";
                 case 0x0806:
-                        return returnStrings[3];
+                        return "ARP";
                 case 0x8035:
-                        return returnStrings[4];
+                        return "RARP";
                 case 0x8137:
-                        return returnStrings[5];
+                        return "NET_IPX";
 		case 0x8191:
-			return returnStrings[6];
+			return "NET_BIOS";
 		default:
-			return returnStrings[7];
+			return "INVALID";
 	}
 }
 
@@ -79,7 +79,7 @@ char* returnIPAddress(uint32_t ipAddr) {
 	
 	ipStr = (char *)malloc(20);
 
-	sprintf(ipStr, 20, "%d.%d.%d.%d", ipAddr&0xff, (ipAddr&0xff00)>>8, (ipAddr&0xff0000)>>16, (ipAddr&0xff000000)>>24);
+	sprintf(ipStr, "%d.%d.%d.%d", ipAddr&0xff, (ipAddr&0xff00)>>8, (ipAddr&0xff0000)>>16, (ipAddr&0xff000000)>>24);
 
 	return ipStr;
 }
