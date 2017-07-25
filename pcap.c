@@ -43,6 +43,8 @@ char* getEthHeaderType(uint16_t intType);
 char* returnIPAddress(uint32_t ipAddr);
 char* getProtocolType(uint8_t intType);
 
+void hexDump(char *desc, void *addr, int len);
+
 int main(int argc, char *argv[]) {
 	char errbuf[PCAP_ERRBUF_SIZE];
 	pcap_t *handle;
@@ -54,7 +56,7 @@ int main(int argc, char *argv[]) {
 		printf("Usage: ./pcap [dev_name]\n");
 		return -1;
 	}
-	
+
 	if(argv[1] == NULL) {
 		fprintf(stderr, "Couldn't find default device!\n");
 		return 2;
@@ -71,7 +73,6 @@ int main(int argc, char *argv[]) {
 	while(1) {
 		if(pcap_next_ex(handle, &header, &pktData) == -1) {
 			printf("Error occured!\n");
-			return -1;
 		}
 		printPacketInfo(header, pktData);
 	}
@@ -80,13 +81,13 @@ int main(int argc, char *argv[]) {
 }	
 
 char* returnMacAddress(const uint8_t *macAddr) {
-        char *macStr;
+	char *macStr;
 
 	macStr = (char *)malloc(20);
 
-        sprintf(macStr, "%02x:%02x:%02x:%02x:%02x:%02x", macAddr[0], macAddr[1], macAddr[2], macAddr[3], macAddr[4], macAddr[5]);
+	sprintf(macStr, "%02x:%02x:%02x:%02x:%02x:%02x", macAddr[0], macAddr[1], macAddr[2], macAddr[3], macAddr[4], macAddr[5]);
 
-        return macStr;
+	return macStr;
 }
 
 uint16_t typeConvert(uint16_t type) {
@@ -97,18 +98,18 @@ char* getEthHeaderType(uint16_t intType) {
 	uint16_t type = typeConvert(intType);
 
 	switch(type) {
-                case 0x0600:
-                        return "XNS_IDP";
-                case 0x0800:
-                        return "IPv4";
-                case 0x0805:
-                        return "X25_PLP";
-                case 0x0806:
-                        return "ARP";
-                case 0x8035:
-                        return "RARP";
-                case 0x8137:
-                        return "NET_IPX";
+		case 0x0600:
+			return "XNS_IDP";
+		case 0x0800:
+			return "IPv4";
+		case 0x0805:
+			return "X25_PLP";
+		case 0x0806:
+			return "ARP";
+		case 0x8035:
+			return "RARP";
+		case 0x8137:
+			return "NET_IPX";
 		case 0x8191:
 			return "NET_BIOS";
 		default:
@@ -118,7 +119,7 @@ char* getEthHeaderType(uint16_t intType) {
 
 char* returnIPAddress(uint32_t ipAddr) {
 	char *ipStr;
-	
+
 	ipStr = (char *)malloc(20);
 
 	sprintf(ipStr, "%d.%d.%d.%d", ipAddr&0xff, (ipAddr&0xff00)>>8, (ipAddr&0xff0000)>>16, (ipAddr&0xff000000)>>24);
@@ -129,16 +130,16 @@ char* returnIPAddress(uint32_t ipAddr) {
 char* getProtocolType(uint8_t intType) {
 	// ICMP 1, IGMP 2, TCP 6, UDP 17
 	switch(intType) {
-	case 1:
-		return "ICMP";
-	case 2:
-		return "IGMP";
-	case 6:
-		return "TCP";
-	case 17:
-		return "UDP";
-	default:
-		return "INVALID";
+		case 1:
+			return "ICMP";
+		case 2:
+			return "IGMP";
+		case 6:
+			return "TCP";
+		case 17:
+			return "UDP";
+		default:
+			return "INVALID";
 	}
 }
 
@@ -204,7 +205,7 @@ void printPacketInfo(struct pcap_pkthdr *header, const u_char *pktData) {
 		printf("Source Port: [%d]\n\n", sPort);
 
 		printf("Data: ");
-		write(1, pktData+sizeof(const struct ethernetHeader)+ipHdrLen+tcpHdrLen, dataLen);
+		hexDump("Packet Data", (void *)(pktData+sizeof(const struct ethernetHeader)+ipHdrLen+tcpHdrLen), dataLen);
 		printf("\n\n");
 		return;
 	}
@@ -212,4 +213,56 @@ void printPacketInfo(struct pcap_pkthdr *header, const u_char *pktData) {
 		printf("We does not support other headers.\n\n");
 		return;
 	}
+}
+
+void hexDump(char *desc, void *addr, int len) {
+	int i;
+	unsigned char buff[17];
+	unsigned char *pc = (unsigned char*)addr;
+
+	// Output description if given.
+	if (desc != NULL)
+		printf ("%s:\n", desc);
+
+	if (len == 0) {
+		printf("  ZERO LENGTH\n");
+		return;
+	}
+	if (len < 0) {
+		printf("  NEGATIVE LENGTH: %i\n",len);
+		return;
+	}
+
+	// Process every byte in the data.
+	for (i = 0; i < len; i++) {
+		// Multiple of 16 means new line (with line offset).
+
+		if ((i % 16) == 0) {
+			// Just don't print ASCII for the zeroth line.
+			if (i != 0)
+				printf ("  %s\n", buff);
+
+			// Output the offset.
+			printf ("  %04x ", i);
+		}
+
+		// Now the hex code for the specific character.
+		printf (" %02x", pc[i]);
+
+		// And store a printable ASCII character for later.
+		if ((pc[i] < 0x20) || (pc[i] > 0x7e))
+			buff[i % 16] = '.';
+		else
+			buff[i % 16] = pc[i];
+		buff[(i % 16) + 1] = '\0';
+	}
+
+	// Pad out last line if not exactly 16 characters.
+	while ((i % 16) != 0) {
+		printf ("   ");
+		i++;
+	}
+
+	// And print the final ASCII bit.
+	printf ("  %s\n", buff);
 }
